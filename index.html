@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloevr and Camlo The Cat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f0e8 0%, #e8ddf0 50%, #d8e8f5 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    color: #4a3f55;
+  }
+
+  .title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #b98de0, #7aa6d6, #e09bb0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+  }
+  .subtitle {
+    font-size: 1rem;
+    color: #8a7d9c;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+
+  .countdown-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 32px 40px;
+    box-shadow: 0 12px 40px rgba(150,120,190,0.18);
+    text-align: center;
+    margin-bottom: 36px;
+    width: 100%;
+    max-width: 620px;
+  }
+  .countdown-card h2 {
+    font-size: 1.25rem;
+    color: #8a7d9c;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .timer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 84px;
+  }
+  .unit .num {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #6f5aa8;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit .label {
+    font-size: 0.85rem;
+    color: #9a8cad;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  .guestbook {
+    width: 100%;
+    max-width: 620px;
+  }
+  .guestbook h2 {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+    color: #6f5aa8;
+  }
+  .messages {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .msg {
+    background: rgba(255,255,255,0.82);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(150,120,190,0.10);
+    border-left: 4px solid #b98de0;
+    animation: fadeIn .4s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg .msg-date {
+    font-size: 0.82rem;
+    color: #a294b8;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .msg .msg-text {
+    font-size: 1.02rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .empty {
+    text-align: center;
+    color: #a294b8;
+    font-size: 0.95rem;
+    padding: 20px;
+  }
+
+  footer {
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: #a294b8;
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="title">Cloevr and Camlo The Cat</h1>
+  <p class="subtitle">Since November 2, 2026</p>
+
+  <!-- 倒数日 -->
+  <div class="countdown-card">
+    <h2>Days Together</h2>
+    <div class="timer">
+      <div class="unit"><span class="num" id="days">0</span><span class="label">Days</span></div>
+      <div class="unit"><span class="num" id="hours">0</span><span class="label">Hours</span></div>
+      <div class="unit"><span class="num" id="minutes">0</span><span class="label">Minutes</span></div>
+      <div class="unit"><span class="num" id="seconds">0</span><span class="label">Seconds</span></div>
+    </div>
+  </div>
+
+  <!-- eee -->
+  <div class="guestbook">
+    <h2>"嘻嘻"</h2>
+    <div class="messages" id="msgList"></div>
+  </div>
+
+  <footer>Cloevr &amp; Camlo The Cat · Made with love</footer>
+
+<script>
+  /* ============================================================
+   * 1. 倒数日起点
+   *    写死为 2026-11-02 00:00:00（本地时间）。
+   *    想改起点，只改这里的 START_DATE 即可。
+   *    注意：JS 的月份是 0 基，所以 11 月要写 10。
+   * ============================================================ */
+  const START_DATE = new Date(2026, 10, 2, 0, 0, 0);
+
+  function updateCountdown() {
+    const now = new Date();
+    let diff = now - START_DATE;
+    if (diff < 0) diff = 0;
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours   = Math.floor(minutes / 60);
+    const days    = Math.floor(hours / 24);
+
+    document.getElementById('days').textContent    = String(days).padStart(2, '0');
+    document.getElementById('hours').textContent   = String(hours % 24).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes % 60).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(seconds % 60).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+
+  /* ============================================================
+   * 2. 留言数据（在这里维护，直接在代码里增删改）
+   *
+   *    每条留言是一个对象：
+   *      date —— 日期，格式 "YYYY-MM-DD"（如 "2026-11-02"）
+   *      text —— 留言内容，支持多行（用 \n 换行）
+   *
+   *    【添加一条】 复制下面任意一条 {...}，改 date 和 text 即可。
+   *    【删除一条】 把对应的 {...} 整条删掉。
+   *    【调整顺序】 数组默认按 date 从新到旧排列，改顺序不影响显示。
+   * ============================================================ */
+  const MESSAGES = [
+    {
+      date: "2026-11-05",
+      text: "开始啦"
+    }
+    // 👉 想加新留言，在上面的 {} 后面加一个逗号，再粘贴一条新的 {} 即可
+  ];
+
+
+
+  function renderMessages() {
+    const list = document.getElementById('msgList');
+    list.innerHTML = '';
+
+    // 没有留言时的提示
+    if (!MESSAGES || MESSAGES.length === 0) {
+      list.innerHTML = '<p class="empty">No messages yet 🐾</p>';
+      return;
+    }
+
+    // 按日期从新到旧排序
+    const sorted = MESSAGES.slice().sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+
+    sorted.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'msg';
+      div.innerHTML = `
+        <div class="msg-date">📅 ${msg.date}</div>
+        <div class="msg-text"></div>
+      `;
+      // 用 textContent 插入正文，避免 XSS，同时保留换行
+      div.querySelector('.msg-text').textContent = msg.text;
+      list.appendChild(div);
+    });
+  }
+
+  renderMessages();
+</script>
+</body>
+</html>
