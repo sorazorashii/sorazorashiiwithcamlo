@@ -208,13 +208,12 @@
     const list = document.getElementById('msgList');
     list.innerHTML = '';
 
-    // 没有留言时的提示
+
     if (!MESSAGES || MESSAGES.length === 0) {
       list.innerHTML = '<p class="empty">No messages yet 🐾</p>';
       return;
     }
 
-    // 按日期从新到旧排序
     const sorted = MESSAGES.slice().sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
@@ -226,7 +225,7 @@
         <div class="msg-date">📅 ${msg.date}</div>
         <div class="msg-text"></div>
       `;
-      // 用 textContent 插入正文，避免 XSS，同时保留换行
+
       div.querySelector('.msg-text').textContent = msg.text;
       list.appendChild(div);
     });
